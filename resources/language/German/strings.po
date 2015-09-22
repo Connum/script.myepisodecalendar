@@ -1,7 +1,7 @@
 # XBMC Media Center language file
 # Addon Name: MyEpisodeCalendar
 # Addon id: script.myepisodecalendar
-# Addon version: 1.0.0
+# Addon version: 1.0.1
 # Addon Provider: Connum
 msgid ""
 msgstr ""
