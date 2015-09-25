@@ -11,8 +11,9 @@
   <extension point="xbmc.addon.metadata">
     <summary lang="en">MyEpisodeCalendar</summary>
     <description lang="en">Automatically set watched episodes on MyEpisodeCalendar.com</description>
+    <description lang="de">Angesehene Serien-Episoden automatisch auf MyEpisodeCalendar.com als gesehen markieren.</description>
     <platform>all</platform>
-    <language>en fr it pt es de</language>
+    <language></language>
     <forum></forum>
     <website></website>
     <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
