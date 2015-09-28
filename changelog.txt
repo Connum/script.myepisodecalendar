@@ -1,3 +1,6 @@
+1.0.2
++ Re-check login status and automatic re-login if required when marking an episode as watched.
+  (myepisodecalendar.com seems to have a rather short time span for auto-logout)
 1.0.1
 + Add German language
 + Some cosmetic changes for settings and notifications
