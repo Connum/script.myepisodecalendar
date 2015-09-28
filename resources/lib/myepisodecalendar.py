@@ -5,7 +5,7 @@ from BeautifulSoup import BeautifulSoup
 import cookielib
 import re
 import urllib, urllib2, urlparse
-#import xbmc # only for debugging
+# import xbmc # only for debugging
 
 # This is totally stolen from script.xbmc.subtitles plugin !
 REGEX_EXPRESSIONS = [
@@ -32,7 +32,7 @@ def sanitize(title, replace):
     return title
 
 # only for debugging
-#def log(msg):
+# def log(msg):
 #    xbmc.log("################## DEBUG: \n%s" % (msg, ),
 #        level=xbmc.LOGDEBUG)
 
@@ -42,7 +42,12 @@ class MyEpisodeCalendar(object):
         self.userid = userid
         self.password = password
         self.shows = {}
+        self.is_logged = False
 
+        self.init_request_opener()
+        self.do_login()
+
+    def init_request_opener(self):
         self.cj = cookielib.CookieJar()
         self.opener = urllib2.build_opener(
             urllib2.HTTPRedirectHandler(),
@@ -54,19 +59,41 @@ class MyEpisodeCalendar(object):
             ('User-agent', 'Lynx/2.8.1pre.9 libwww-FM/2.14')
         ]
 
+    # force logout, mainly for debugging
+    def do_logout(self):
+        self.init_request_opener()
+
+    def do_login(self):
         login_data = urllib.urlencode({
             'email' : self.userid,
             'password' : self.password,
             'submit' : "Login",
             })
         login_url = "%s/%s" % (MYEPISODE_URL, "login/")
-        self.send_req(login_url, login_data)
+        data = self.send_req(login_url, login_data)
+
+        return self.check_login_status_from_settings()
+
+    def check_login_status_from_settings(self):
         settings_url = "%s/%s" % (MYEPISODE_URL, "settings/")
         data = self.send_req(settings_url)
+
         self.is_logged = True
+
         # Quickly check if it seems we are logged on.
         if (data is None) or (self.userid not in data):
             self.is_logged = False
+
+        return self.is_logged
+
+    def check_login_status_from_data(self, data):
+        self.is_logged = True
+
+        # Quickly check if it seems we are logged on.
+        if (data is None) or (">Logout<" not in data):
+            self.is_logged = False
+
+        return self.is_logged
 
     def send_req(self, url, data = None):
         try:
@@ -79,6 +106,8 @@ class MyEpisodeCalendar(object):
         # Populate shows with the list of show_ids in our account
         myshows_url = "%s/%s" % (MYEPISODE_URL, "myShows")
         data = self.send_req(myshows_url)
+
+
         if data is None:
             return False
         soup = BeautifulSoup(data)
@@ -204,15 +233,25 @@ class MyEpisodeCalendar(object):
         return True
 
     def set_episode_watched(self, show_id, season, episode):
-        # http://www.myepisodecalendar.com/episodeSummaries/Family-Guy/68/Season-1
         season_url = "%s/episodes//%d/Season-%d" % (MYEPISODE_URL,
                 show_id, int(season))
         episode = int(episode)
 
         season_data = self.send_req(season_url)
+
+        # re-login if logged out meanwhile
+        if (not self.check_login_status_from_data(season_data)):
+            if self.do_login():
+                season_data = self.send_req(season_url)
+            else:
+                return False
+
         soup = BeautifulSoup(season_data)
 
         divs_epno = soup.findAll("div", {"id": "episodeNo"})
+        if divs_epno is None:
+            return False
+
         for epnodiv in divs_epno:
             try:
                 intContent = int(epnodiv.string.strip())
@@ -222,6 +261,7 @@ class MyEpisodeCalendar(object):
                 if intContent == int(episode):
                     div_epno = epnodiv
                     break
+
 
         # episode could not be found on this page...
         if div_epno is None:
@@ -240,5 +280,6 @@ class MyEpisodeCalendar(object):
 
         if data is None:
             return False
+
         return True
 

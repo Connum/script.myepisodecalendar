@@ -100,6 +100,14 @@ class Player(xbmc.Player):
             notif(__language__(32927), time=2500)
         return mye
 
+    def _mecReCheckAuth(self):
+        if (not self.mye.is_logged):
+            log("not logged in anymore")
+            login_notif = __language__(32912)
+            notif(login_notif, time=2500)
+            return False
+        return True
+
     def _addShow(self):
         # Add the show if it's not already in our account
         if self.showid in self.mye.shows.values():
@@ -181,6 +189,9 @@ class Player(xbmc.Player):
             if __addon__.getSetting('showNotif-marked') != "true":
                 showMarkedNotif = False
             found = 32924
+        else:
+            if (not self._mecReCheckAuth()):
+                return False
 
         if showMarkedNotif is True:
             notif("%s (S%sE%s) %s" % (self.title, self.season.zfill(2), self.episode.zfill(2),
