@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-	<category>
-		<setting type="lsep" label="32901" />
+	<category label="32901">
+		<!--setting type="lsep" label="32901" /-->
 		<setting id="Username" type="text" label="32902" default="" />
 		<setting id="Password" type="text" option="hidden" label="32903" default="" />
 		<setting id="watched-percent" type="slider" option="percent" label="32904" default="70" range="70,5,100" />
@@ -12,5 +12,12 @@
 		<setting id="showNotif-found"   type="bool" label="32929" default="true" />
 		<setting id="showNotif-autoadd" type="bool" label="32925" default="true" />
 		<setting id="showNotif-marked"  type="bool" label="32924" default="true" />
+	</category>
+	<category label="32960">
+		<setting id="tvsna-enabled"     type="bool" label="32961" default="true" />
+		<setting                      type="action" label="32962" action="RunScript(script.myepisodecalendar, addShowsNow)" enable="eq(-1,true)" visible="eq(-1,true)"/>
+		<setting id="tvsna-onstartup"   type="bool" label="32963" default="true" enable="eq(-2,true)" visible="eq(-2,true)"/>
+		<setting id="tvsna-silent"      type="bool" label="32964" default="true" enable="eq(-1,true)" visible="eq(-3,true)" subsetting="true" />
+		<setting id="tvsna-showgui"     type="bool" label="32965" default="false" enable="eq(-4,true)" visible="eq(-4,true)"/>
 	</category>
 </settings>

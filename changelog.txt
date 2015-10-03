@@ -1,3 +1,9 @@
+1.1.0
++ Added script.tv.show.next.aired integration:
+  Series from MyEpisodeCalendar can now be added to the "TV Show - Next Aired" Add-On's setting "Extra shows".
+  Plus, MyEpisodeCalendar can automatically show the "Next Aired" GUI on startup.
+  Known issue: MyEpisodeCalendar will now be listed in Programs, despite not doing more than just opening its settings dialogue.
+  TODO: remove series from Next Aired when removed from MyEpisodeCalendar
 1.0.2
 + Re-check login status and automatic re-login if required when marking an episode as watched.
   (myepisodecalendar.com seems to have a rather short time span for auto-logout)

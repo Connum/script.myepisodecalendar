@@ -45,7 +45,25 @@ msgctxt "#32905"
 msgid "Automatically add shows"
 msgstr ""
 
-#empty strings from id 32906 to 32910
+msgctxt "#32906"
+msgid "Adding shows to Next Aired..."
+msgstr ""
+
+msgctxt "#32907"
+msgid "Fetching series from MyEpisodeCalendar..."
+msgstr ""
+
+msgctxt "#32908"
+msgid "Looking up TVDB ID for"
+msgstr ""
+
+msgctxt "#32909"
+msgid "Finished adding shows."
+msgstr ""
+
+msgctxt "#32910"
+msgid "%s TVDB IDs have been added to Extra Shows,\n%s were already included,\n%s failed."
+msgstr ""
 
 msgctxt "#32911"
 msgid "connected"
@@ -83,4 +101,28 @@ msgstr ""
 
 msgctxt "#32929"
 msgid "name of the series"
+msgstr ""
+
+msgctxt "#32960"
+msgid "TV Show Next Aired"
+msgstr ""
+
+msgctxt "#32961"
+msgid "Enable integration (if script.tv.show.next.aired is available)"
+msgstr ""
+
+msgctxt "#32962"
+msgid "Add shows from MyEpisodeCalendar now"
+msgstr ""
+
+msgctxt "#32963"
+msgid "Add shows from MyEpisodeCalendar on startup"
+msgstr ""
+
+msgctxt "#32964"
+msgid "silently"
+msgstr ""
+
+msgctxt "#32965"
+msgid "Show Next Aired window on startup"
 msgstr ""

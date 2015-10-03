@@ -27,8 +27,10 @@ REGEX_EXPRESSIONS = [
 MYEPISODE_URL = "http://www.myepisodecalendar.com"
 
 def sanitize(title, replace):
-    for char in ['[', ']', '_', '(', ')', '..', '.', '-', '  ']:
+    for char in ['[', ']', '_', '(', ')', '..', '.', '-']:
         title = title.replace(char, replace)
+
+    title = title.replace('  ', ' ')
     return title
 
 # only for debugging
@@ -283,3 +285,18 @@ class MyEpisodeCalendar(object):
 
         return True
 
+    def getTVDBIDFromShowTitle(self, title, lang='en'):
+        GetSeriesURL = 'http://www.thetvdb.com/api/GetSeries.php?seriesname=%s&language=%s' % (urllib.quote(title), lang)
+        seriesData = self.send_req(GetSeriesURL)
+
+        if seriesData is None:
+            return False
+
+        soup = BeautifulSoup(seriesData)
+
+        try:
+            seriesid = soup.find('seriesid').text;
+        except:
+            seriesid = False
+
+        return seriesid

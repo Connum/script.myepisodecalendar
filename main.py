@@ -5,10 +5,10 @@ import os
 import re
 import sys
 import threading
-import xbmc
-import xbmcaddon
+import xbmc, xbmcaddon
 
 __addon__         = xbmcaddon.Addon()
+__addonid__       = __addon__.getAddonInfo('id')
 __cwd__           = __addon__.getAddonInfo('path')
 __icon__          = __addon__.getAddonInfo("icon")
 __scriptname__    = __addon__.getAddonInfo('name')
@@ -16,6 +16,23 @@ __version__       = __addon__.getAddonInfo('version')
 __language__      = __addon__.getLocalizedString
 __resource_path__ = os.path.join(__cwd__, 'resources', 'lib')
 __resource__      = xbmc.translatePath(__resource_path__).decode('utf-8')
+__datapath__      = os.path.join(xbmc.translatePath('special://masterprofile/addon_data/').decode('utf-8'), __addonid__)
+
+DB_CACHE_TVDB_IDS = 'cache.tvdb.ids.db'
+
+__nextAired__     = False
+
+if __addon__.getSetting('tvsna-enabled'):
+    try:
+        __nextAired__     = xbmcaddon.Addon(id='script.tv.show.next.aired')
+        addon_path = __nextAired__.getAddonInfo('path')
+        sys.path.append (xbmc.translatePath( os.path.join(addon_path) ))
+        sys.path = [xbmc.translatePath( os.path.join(addon_path, 'resources', 'lib') )] + sys.path
+
+        from default import NextAired
+        import xbmcvfs, xbmcgui
+    except:
+        __nextAired__     = False
 
 from resources.lib.myepisodecalendar import MyEpisodeCalendar
 
@@ -76,7 +93,8 @@ class Player(xbmc.Player):
             self._tracker.join()
         self._tracker = None
 
-    def _loginMyEpisodeCalendar(self):
+    @staticmethod
+    def _loginMyEpisodeCalendar(silent=False):
         username = __addon__.getSetting('Username')
         password = __addon__.getSetting('Password')
 
@@ -88,7 +106,7 @@ class Player(xbmc.Player):
         showLoginNotif = True
         mye = MyEpisodeCalendar(username, password)
         if mye.is_logged:
-            if __addon__.getSetting('showNotif-login') != "true":
+            if __addon__.getSetting('showNotif-login') != "true" or silent:
                 showLoginNotif = False
 
             login_notif = "%s %s" % (username, __language__(32911))
@@ -98,6 +116,29 @@ class Player(xbmc.Player):
 
         if mye.is_logged and (not mye.get_show_list()):
             notif(__language__(32927), time=2500)
+
+        if (not silent and __addon__.getSetting('tvsna-enabled') != "false"):
+            if(__nextAired__):
+                log('script.tv.show.next.aired is available')
+
+                if __addon__.getSetting('tvsna-showgui') != "false":
+                    xbmc.executebuiltin("XBMC.RunScript(script.tv.show.next.aired)")
+
+                changedCount = 0
+                if __addon__.getSetting('tvsna-onstartup') != "false":
+                    changedCount = addShowsToTSNA(mye, silent=True)
+
+                    if (__addon__.getSetting('tvsna-silent') != "false"):
+                        silentParam = '&silent=True'
+                    else:
+                        silentParam = ''
+
+                    if (changedCount > 0):
+                        xbmc.executebuiltin("XBMC.RunScript(script.tv.show.next.aired,force=True%s)" % silentParam)
+
+            else:
+                log('script.tv.show.next.aired is NOT available')
+
         return mye
 
     def _mecReCheckAuth(self):
@@ -202,13 +243,104 @@ def notif(msg, time=5000):
     xbmc.executebuiltin("XBMC.Notification(%s)" % notif_msg.encode('utf-8'))
 
 def log(msg):
-    xbmc.log("### [%s] - %s" % (__scriptname__, msg.encode('utf-8'), ),
+    try:
+        msg = msg.encode('utf-8')
+    except:
+        pass
+
+    xbmc.log("### [%s] - %s" % (__scriptname__, msg, ),
             level=xbmc.LOGDEBUG)
 
 def _is_excluded(filename):
     log("_is_excluded(): Check if '%s' is a URL." % filename)
     excluded_protocols = ["pvr://", "http://", "https://"]
     return any(protocol in filename for protocol in excluded_protocols)
+
+def addShowsProgressDiag():
+    progressdiag = xbmcgui.DialogProgress()
+    progressdiag.create(__language__(32906), __language__(32907))
+
+    progressdiag.update(0)
+    return progressdiag
+
+def addShowsToTSNA(mye, progressdiag=False, silent=False):
+    if (not progressdiag and not silent):
+        progressdiag = addShowsProgressDiag()
+
+    tvdbLang = __nextAired__.getSetting("SearchLang").split(' ')[0]
+
+    ExtraShows = re.findall(r"\d+", __nextAired__.getSetting("ExtraShows"))
+
+    TVDBidCache = NextAired.get_list(DB_CACHE_TVDB_IDS)
+
+    if (TVDBidCache == []):
+        TVDBidCache = {}
+
+    log("TVDBidCache")
+    log(TVDBidCache)
+
+    show_stack = mye.shows.keys()
+    showCount = len(mye.shows)
+    stackIndex = 0;
+
+    addedCount = 0
+    includedCount = 0
+    failedCount = 0
+
+    while True:
+        if not silent and (not mye.is_logged or progressdiag.iscanceled()):
+            progressdiag.close()
+            break
+
+        seriesID_mye  = mye.shows.values()[stackIndex]
+        seriesID_tvdb = False
+        seriesTitle   = show_stack.pop(0)
+        if ';' in seriesTitle:
+            seriesTitle = seriesTitle.split(';')[0]
+
+        
+        log('Looking up TVDB ID for series "%s" | MYE ID: %s' % (seriesTitle, seriesID_mye))
+        if not silent:
+            percent = int(round((showCount - len(show_stack)) / showCount))
+            progressdiag.update(percent, __language__(32908), '"%s"' % seriesTitle)
+
+        seriesID_tvdb = False
+        try:
+            seriesID_tvdb = TVDBidCache[seriesID_mye]
+            log('TVDB ID is in cache: %s' % seriesID_tvdb)
+        except:
+            log('fetching id from TVDB API...')
+            fetchedID = mye.getTVDBIDFromShowTitle(seriesTitle).decode('utf-8')
+            if(fetchedID):
+                seriesID_tvdb = fetchedID
+                TVDBidCache[seriesID_mye] = fetchedID
+                log('fetched TVDB ID %s' % seriesID_tvdb)
+
+        if (not seriesID_tvdb):
+            failedCount=failedCount+1
+            log('ERROR: Failed getting TVDB ID!')
+        elif (seriesID_tvdb not in ExtraShows):
+            ExtraShows.append(seriesID_tvdb)
+            addedCount=addedCount+1
+            log('TVDB ID %s added to extra shows' % seriesID_tvdb)
+        else:
+            includedCount=includedCount+1
+            log('TVDB ID %s is already in extra shows' % seriesID_tvdb)
+
+        stackIndex=stackIndex+1
+
+        if (len(show_stack) < 1):
+            if not silent:
+                progressdiag.update(100)
+                progressdiag.close()
+                xbmcgui.Dialog().ok(__language__(32909),__language__(32910) % (addedCount, includedCount, failedCount))
+            break
+        
+    NextAired.save_file(TVDBidCache, DB_CACHE_TVDB_IDS)
+    
+    __nextAired__.setSetting('ExtraShows', ','.join(ExtraShows))
+
+    return addedCount
 
 if ( __name__ == "__main__" ):
     player = Player()
@@ -223,3 +355,17 @@ if ( __name__ == "__main__" ):
     player._tearDown()
     sys.exit(0)
 
+elif ( __nextAired__ and sys.argv and sys.argv[1] and sys.argv[1] == 'addShowsNow'):
+    log("started from settings")
+    
+    progressdiag = addShowsProgressDiag()
+
+    mye = Player._loginMyEpisodeCalendar(silent=True)
+        
+    if mye.is_logged:
+        addShowsToTSNA(mye, progressdiag)
+    
+    sys.exit(0)
+
+
+    
