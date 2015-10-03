@@ -198,7 +198,7 @@ class Player(xbmc.Player):
                 __language__(found)))
 
 def notif(msg, time=5000):
-    notif_msg = "%s, %s, %i, %s" % ('MyEpisodeCalendar', msg, time, __icon__)
+    notif_msg = "\"%s\", \"%s\", %i, %s" % ('MyEpisodeCalendar', msg.decode('utf-8', "replace"), time, __icon__)
     xbmc.executebuiltin("XBMC.Notification(%s)" % notif_msg.encode('utf-8'))
 
 def log(msg):
