@@ -121,21 +121,14 @@ class Player(xbmc.Player):
             if(__nextAired__):
                 log('script.tv.show.next.aired is available')
 
-                if __addon__.getSetting('tvsna-showgui') != "false":
-                    xbmc.executebuiltin("XBMC.RunScript(script.tv.show.next.aired)")
-
                 changedCount = 0
                 if __addon__.getSetting('tvsna-onstartup') != "false":
                     changedCount = addShowsToTSNA(mye, silent=True)
 
-                    if (__addon__.getSetting('tvsna-silent') != "false"):
-                        silentParam = '&silent=True'
-                    else:
-                        silentParam = ''
-
                     if (changedCount > 0):
-                        xbmc.executebuiltin("XBMC.RunScript(script.tv.show.next.aired,force=True%s)" % silentParam)
-
+                        xbmc.executebuiltin("XBMC.RunScript(script.tv.show.next.aired,force=True)")
+                    elif __addon__.getSetting('tvsna-showgui') != "false":
+                        xbmc.executebuiltin("XBMC.RunScript(script.tv.show.next.aired)")
             else:
                 log('script.tv.show.next.aired is NOT available')
 
@@ -263,36 +256,50 @@ def addShowsProgressDiag():
     progressdiag.update(0)
     return progressdiag
 
+def mceIDsToTVDBIDs(showlist, TVDBidCache):
+    show_stack_v = showlist.values()
+
+    tvdbIds = []
+    for mecId in show_stack_v:
+        tvdbIds.append(TVDBidCache[mecId])
+
+    return tvdbIds
+
+
 def addShowsToTSNA(mye, progressdiag=False, silent=False):
     if (not progressdiag and not silent):
         progressdiag = addShowsProgressDiag()
 
     tvdbLang = __nextAired__.getSetting("SearchLang").split(' ')[0]
 
-    ExtraShows = re.findall(r"\d+", __nextAired__.getSetting("ExtraShows"))
+    ESSetting = __nextAired__.getSetting("ExtraShows")
+    ExtraShows = re.findall(r"(?:mec)?\d+", ESSetting)
 
     TVDBidCache = NextAired.get_list(DB_CACHE_TVDB_IDS)
 
     if (TVDBidCache == []):
         TVDBidCache = {}
 
-    log("TVDBidCache")
-    log(TVDBidCache)
-
     show_stack = mye.shows.keys()
+    show_stack_v = mye.shows.values()
     showCount = len(mye.shows)
     stackIndex = 0;
 
     addedCount = 0
     includedCount = 0
     failedCount = 0
+    removedCount = 0
+
+    checkRemoved = __addon__.getSetting('tvsna-autoremove') != "false"
+
+    percent = 0
 
     while True:
         if not silent and (not mye.is_logged or progressdiag.iscanceled()):
             progressdiag.close()
             break
 
-        seriesID_mye  = mye.shows.values()[stackIndex]
+        seriesID_mye  = show_stack_v[stackIndex]
         seriesID_tvdb = False
         seriesTitle   = show_stack.pop(0)
         if ';' in seriesTitle:
@@ -301,7 +308,7 @@ def addShowsToTSNA(mye, progressdiag=False, silent=False):
         
         log('Looking up TVDB ID for series "%s" | MYE ID: %s' % (seriesTitle, seriesID_mye))
         if not silent:
-            percent = int(round((showCount - len(show_stack)) / showCount))
+            percent = int(round((showCount - len(show_stack)) / (showCount + (len(ExtraShows) if checkRemoved else 0))))
             progressdiag.update(percent, __language__(32908), '"%s"' % seriesTitle)
 
         seriesID_tvdb = False
@@ -319,8 +326,8 @@ def addShowsToTSNA(mye, progressdiag=False, silent=False):
         if (not seriesID_tvdb):
             failedCount=failedCount+1
             log('ERROR: Failed getting TVDB ID!')
-        elif (seriesID_tvdb not in ExtraShows):
-            ExtraShows.append(seriesID_tvdb)
+        elif (seriesID_tvdb not in ExtraShows and 'mec' + seriesID_tvdb not in ExtraShows):
+            ExtraShows.append('mec' + seriesID_tvdb)
             addedCount=addedCount+1
             log('TVDB ID %s added to extra shows' % seriesID_tvdb)
         else:
@@ -330,17 +337,53 @@ def addShowsToTSNA(mye, progressdiag=False, silent=False):
         stackIndex=stackIndex+1
 
         if (len(show_stack) < 1):
-            if not silent:
-                progressdiag.update(100)
-                progressdiag.close()
-                xbmcgui.Dialog().ok(__language__(32909),__language__(32910) % (addedCount, includedCount, failedCount))
             break
-        
-    NextAired.save_file(TVDBidCache, DB_CACHE_TVDB_IDS)
     
+    NextAired.save_file(TVDBidCache, DB_CACHE_TVDB_IDS)
+
+    percentStepTwo = 0
+    
+    # delete shows that are no longer followed on MyEpisodeCalendar
+    if(checkRemoved):
+        tvdbIds = mceIDsToTVDBIDs(mye.shows, TVDBidCache)
+        CleanedExtraShows = []
+
+        esCount = 0
+        for showId in ExtraShows:
+            cleanId = re.sub(r"\D+", '', showId)
+            esCount = esCount + 1
+            if not silent:
+                percentStepTwo = percent + int(round(esCount / len(ExtraShows)))
+                progressdiag.update(percentStepTwo, __language__(32913), '"%s"' % cleanId)
+            if (re.sub(r"\d+", '', showId) != 'mec'):
+                log("showId %s not added by MEC" % showId)
+                CleanedExtraShows.append(showId)
+                continue
+
+            if (cleanId in tvdbIds):
+                log("showId %s is in shows list" % cleanId)
+                CleanedExtraShows.append('mec' + cleanId)
+            else:
+                log("remove %s from shows list" % cleanId)
+                removedCount = removedCount+1
+
+        ExtraShows = CleanedExtraShows
+
+
+
+    # save new ExtraShows list to script.tv.show.next.aired settings
     __nextAired__.setSetting('ExtraShows', ','.join(ExtraShows))
 
-    return addedCount
+    log("added %s IDs" % addedCount)
+    log("removed %s IDs" % removedCount)
+
+    if not silent:
+        progressdiag.update(100)
+        progressdiag.close()
+        xbmcgui.Dialog().ok(__language__(32909),__language__(32910) % (addedCount, includedCount, removedCount, failedCount))
+
+    changedCount = addedCount + removedCount
+    return changedCount
 
 if ( __name__ == "__main__" ):
     player = Player()

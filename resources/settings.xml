@@ -15,9 +15,9 @@
 	</category>
 	<category label="32960">
 		<setting id="tvsna-enabled"     type="bool" label="32961" default="true" />
-		<setting                      type="action" label="32962" action="RunScript(script.myepisodecalendar, addShowsNow)" enable="eq(-1,true)" visible="eq(-1,true)"/>
-		<setting id="tvsna-onstartup"   type="bool" label="32963" default="true" enable="eq(-2,true)" visible="eq(-2,true)"/>
-		<setting id="tvsna-silent"      type="bool" label="32964" default="true" enable="eq(-1,true)" visible="eq(-3,true)" subsetting="true" />
+		<setting id="tvsna-autoremove"  type="bool" label="32962" default="true" enable="eq(-1,true)" visible="eq(-1,true)"/>
+		<setting                      type="action" label="32963" action="RunScript(script.myepisodecalendar, addShowsNow)" enable="eq(-2,true)" visible="eq(-2,true)"/>
+		<setting id="tvsna-onstartup"   type="bool" label="32964" default="true" enable="eq(-3,true)" visible="eq(-3,true)"/>
 		<setting id="tvsna-showgui"     type="bool" label="32965" default="false" enable="eq(-4,true)" visible="eq(-4,true)"/>
 	</category>
 </settings>

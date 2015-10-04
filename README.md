@@ -45,4 +45,4 @@ zip file, and you're done !
 
 download
 ========
-Get the latest release from the releases tab or download it [here](https://github.com/Connum/script.myepisodecalendar/releases/download/v1.0.2/script.myepisodecalendar-1.0.2.zip) directly.
+Nothing to see here yet.
