@@ -42,7 +42,7 @@ class Monitor(xbmc.Monitor):
         self.action = kwargs['action']
 
     def onSettingsChanged( self ):
-        log('#DEBUG# onSettingsChanged, enabled:')
+        log('#DEBUG# onSettingsChanged')
         # remove shows added by plugin when integration is disabled
         if __nextAired__ and __addon__.getSetting('tvsna-enabled') == 'false':
             __nextAired__.setSetting("ExtraShows", re.sub(r"\D?mec\d+", '', __nextAired__.getSetting("ExtraShows")))
