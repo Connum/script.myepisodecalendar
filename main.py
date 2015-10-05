@@ -42,7 +42,10 @@ class Monitor(xbmc.Monitor):
         self.action = kwargs['action']
 
     def onSettingsChanged( self ):
-        log('#DEBUG# onSettingsChanged')
+        log('#DEBUG# onSettingsChanged, enabled:')
+        # remove shows added by plugin when integration is disabled
+        if __nextAired__ and __addon__.getSetting('tvsna-enabled') == 'false':
+            __nextAired__.setSetting("ExtraShows", re.sub(r"\D?mec\d+", '', __nextAired__.getSetting("ExtraShows")))
         self.action()
 
 class Player(xbmc.Player):
@@ -368,8 +371,6 @@ def addShowsToTSNA(mye, progressdiag=False, silent=False):
                 removedCount = removedCount+1
 
         ExtraShows = CleanedExtraShows
-
-
 
     # save new ExtraShows list to script.tv.show.next.aired settings
     __nextAired__.setSetting('ExtraShows', ','.join(ExtraShows))
