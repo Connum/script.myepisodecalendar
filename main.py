@@ -311,7 +311,10 @@ def addShowsToTSNA(mye, progressdiag=False, silent=False):
         
         log('Looking up TVDB ID for series "%s" | MYE ID: %s' % (seriesTitle, seriesID_mye))
         if not silent:
-            percent = int(round((showCount - len(show_stack)) / (showCount + (len(ExtraShows) if checkRemoved else 0))))
+            if checkRemoved:
+                percent = int(round((showCount - len(show_stack)) / (float(showCount) + float(len(ExtraShows))) * 100))
+            else:
+                percent = int(round((showCount - len(show_stack)) / float(showCount) * 100))
             progressdiag.update(percent, __language__(32908), '"%s"' % seriesTitle)
 
         seriesID_tvdb = False
