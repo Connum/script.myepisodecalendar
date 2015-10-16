@@ -264,7 +264,10 @@ def mceIDsToTVDBIDs(showlist, TVDBidCache):
 
     tvdbIds = []
     for mecId in show_stack_v:
-        tvdbIds.append(TVDBidCache[mecId])
+        try:
+            tvdbIds.append(TVDBidCache[mecId])
+        except:
+            pass
 
     return tvdbIds
 
