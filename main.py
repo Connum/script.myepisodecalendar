@@ -393,14 +393,16 @@ def addShowsToTSNA(mye, progressdiag=False, silent=False):
     return changedCount
 
 if ( __name__ == "__main__" ):
+    monitor = xbmc.Monitor()
     player = Player()
     if not player.mye.is_logged:
         sys.exit(0)
 
     log( "[%s] - Version: %s Started" % (__scriptname__, __version__))
 
-    while not xbmc.abortRequested:
-        xbmc.sleep(100)
+    while not monitor.abortRequested():
+        if monitor.waitForAbort(10):
+            break
 
     player._tearDown()
     sys.exit(0)
