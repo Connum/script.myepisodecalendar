@@ -1,3 +1,5 @@
+1.1.1
++ Technical change only: use monitor.abortRequested() and monitor.waitForAbort() instead of xbmx.abortRequested and xbmx.sleep, see http://sourceforge.net/p/xbmc/mailman/message/34581714/
 1.1.0
 + Added script.tv.show.next.aired integration:
   Series from MyEpisodeCalendar can now be added to the "TV Show - Next Aired" Add-On's setting "Extra shows". Series removed from MyEpisodeCalendar can also be automatically removed from Next Aired (changing this option requires saving the Add-On settings before taking effect when manually updating)
