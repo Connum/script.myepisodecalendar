@@ -195,7 +195,7 @@ class Player(xbmc.Player):
             self._tearDown()
             return
 
-        self.showid = self.mye.find_show_id(self.title)
+        self.title, self.showid = self.mye.find_show_id(self.title)
         if self.showid is None:
             notif("%s %s" % (self.title, __language__(32923)), time=3000)
             self._tearDown()

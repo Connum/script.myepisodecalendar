@@ -121,10 +121,10 @@ class MyEpisodeCalendar(object):
             link_url = link.get('href')
             showid = link_url.split('/')[-1]
             key = link.get('title').strip()
-            sanitized_key = sanitize(key, '')
+            sanitized_key = sanitize(key, ' ')
             if sanitized_key != key:
                 key = ";".join([key, sanitized_key])
-            self.shows[key.lower()] = int(showid)
+            self.shows[key] = int(showid)
         return True
 
     def find_show_link(self, data, show_name, strict=False):
@@ -153,6 +153,7 @@ class MyEpisodeCalendar(object):
         # Try to find the ID of the show in our account first
         # Create a slice with only the show that may match
         slice_show  = {}
+        new_name = show_name
         show_name = show_name.lower()
         
         for keys, v in self.shows.iteritems():
@@ -161,15 +162,17 @@ class MyEpisodeCalendar(object):
             else:
                 keys = [keys,]
             for k in keys:
-                if show_name in k or show_name.startswith(k):
+
+                if show_name in k.lower() or show_name.startswith(k.lower()):
+                    new_name = k
                     slice_show[k] = v
         if len(slice_show) == 1:
-            return slice_show.values()[0]
+            return new_name, slice_show.values()[0]
         # We loop through a slice containings the possibilities and we
         # search strictly for the show name.
         for key, value in slice_show.iteritems():
             if key == show_name:
-                return value
+                return key, value
 
         # You should really never fall there, at this point, the show should be
         # in your account, except if you disabled the feature.
@@ -194,13 +197,13 @@ class MyEpisodeCalendar(object):
 
         # Really did not find anything :'(
         if show_href is None:
-            return None
+            return new_name, None
 
         showid = show_href.split('/')[-1]
 
         if showid is None:
-            return None
-        return int(showid.strip())
+            return new_name, None
+        return int(showid.strip()), 
 
     # This is totally stolen from script.xbmc.subtitles plugin !
     def get_info(self, file_name):
