@@ -129,7 +129,7 @@ class MyEpisodeCalendar(object):
 
     def find_show_link(self, data, show_name, strict=False):
         if data is None:
-            return None
+            return None, None
         soup = BeautifulSoup(data)
         tvshownames = soup.findAll("div", {"class": re.compile(r'\btvShowName\b')})
 
@@ -140,51 +140,44 @@ class MyEpisodeCalendar(object):
             if link.string is None:
                 continue
             if strict:
-                if link.string.lower() == show_name:
+                if sanitize(link.string.lower(), ' ') == show_name:
                     show_href = link.get('href')
+                    show_name = link.get('title')
                     break
             else:
-                if link.string.lower().startswith(show_name):
+                if sanitize(link.string.lower(), ' ').startswith(show_name):
                     show_href = link.get('href')
+                    show_name = link.get('title')
                     break
-        return show_href
+        return show_name, show_href
 
     def find_show_id(self, show_name):
         # Try to find the ID of the show in our account first
         # Create a slice with only the show that may match
-        slice_show  = {}
         new_name = show_name
         show_name = show_name.lower()
-        
+
         for keys, v in self.shows.iteritems():
             if ';' in keys:
                 keys = keys.split(';')
             else:
                 keys = [keys,]
             for k in keys:
-
-                if show_name in k.lower() or show_name.startswith(k.lower()):
+                if show_name == k.lower() or show_name == sanitize(k.lower(), ' '):
                     new_name = k
-                    slice_show[k] = v
-        if len(slice_show) == 1:
-            return new_name, slice_show.values()[0]
-        # We loop through a slice containings the possibilities and we
-        # search strictly for the show name.
-        for key, value in slice_show.iteritems():
-            if key == show_name:
-                return key, value
+                    return new_name, v
 
         # You should really never fall there, at this point, the show should be
         # in your account, except if you disabled the feature.
 
         # It's not in our account yet ?
         # Try Find a show through its name and report its id
-        search_data = urllib.urlencode({
-            'keyword' : show_name,
-            })
-        search_url = "%s/%s" % (MYEPISODE_URL, "search")
-        data = self.send_req(search_url, search_data)
-        show_href = self.find_show_link(data, show_name)
+        search_url = "%s/%s/%s" % (MYEPISODE_URL, "search", show_name.replace(' ', '_'))
+        log('search url: %s' % search_url)
+        data = self.send_req(search_url)
+        new_name, show_href = self.find_show_link(data, show_name)
+        log('show_href:')
+        log(show_href)
 
         # TODO: try to automatically request a show to be added to MEC
         # TODO: check if this is working for MEC
@@ -193,7 +186,7 @@ class MyEpisodeCalendar(object):
             list_url = "%s/%s/%s" % (MYEPISODE_URL, "allShows/filter-by-name",
                     show_name[0].upper())
             data = self.send_req(list_url)
-            show_href = self.find_show_link(data, show_name, strict=True)
+            new_name, show_href = self.find_show_link(data, show_name, strict=True)
 
         # Really did not find anything :'(
         if show_href is None:
@@ -203,7 +196,7 @@ class MyEpisodeCalendar(object):
 
         if showid is None:
             return new_name, None
-        return int(showid.strip()), 
+        return new_name, int(showid.strip()), 
 
     # This is totally stolen from script.xbmc.subtitles plugin !
     def get_info(self, file_name):
