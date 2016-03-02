@@ -173,11 +173,8 @@ class MyEpisodeCalendar(object):
         # It's not in our account yet ?
         # Try Find a show through its name and report its id
         search_url = "%s/%s/%s" % (MYEPISODE_URL, "search", show_name.replace(' ', '_'))
-        log('search url: %s' % search_url)
         data = self.send_req(search_url)
         new_name, show_href = self.find_show_link(data, show_name)
-        log('show_href:')
-        log(show_href)
 
         # TODO: try to automatically request a show to be added to MEC
         # TODO: check if this is working for MEC
