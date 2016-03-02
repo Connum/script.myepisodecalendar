@@ -161,7 +161,7 @@ class Player(xbmc.Player):
             added = 32925
         
         if showAddNotif is True:
-            notif("%s %s" % (self.title, __language__(added)))
+            notif("%s %s" % (self.title, __language__(32925)))
 
     def onPlayBackStarted(self):
         self._setUp()
