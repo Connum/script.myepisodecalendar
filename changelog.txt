@@ -1,6 +1,8 @@
 1.1.2
 + Fixed problems with some show titles
 + Verified that the Add-On works as expected with Jarvis
++ Corrected wrong language string when show has been added automatically
++ Improved show search and show title mapping
 1.1.1
 + Technical change only: use monitor.abortRequested() and monitor.waitForAbort() instead of xbmx.abortRequested and xbmx.sleep, see http://sourceforge.net/p/xbmc/mailman/message/34581714/
 1.1.0
