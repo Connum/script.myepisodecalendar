@@ -1,4 +1,4 @@
-1.1.2
+1.2.0
 + Fixed problems with some show titles
 + Verified that the Add-On works as expected with Jarvis
 + Corrected wrong language string when show has been added automatically
