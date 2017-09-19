@@ -8,6 +8,8 @@ New shows will also be added to your account if you start watching an episode.
 
 Based on script.myepisodes by Maxime Hadjinlian.
 
+The plugin is available in the official Add-On Repository, but you can also build and install it manually.
+
 build
 =====
 If you really want to build it, here is a simple script to do so:
