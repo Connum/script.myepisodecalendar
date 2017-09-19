@@ -179,7 +179,7 @@ class Player(xbmc.Player):
         # We don't want to take care of any URL because we can't really gain
         # information from it. We also only want to check TV episodes, so skip everything else.
         # (not explicitely checking for "episode", "season" or "tvshow", because sometimes it may return empty as well)
-        if mediaType in ["movie","musicvideo","music","song","album","artist"] or _is_excluded(filename_full_path):
+        if mediaType in ["movie", "musicvideo", "music", "song", "album", "artist"] or _is_excluded(filename_full_path):
             self._tearDown()
             return
 
