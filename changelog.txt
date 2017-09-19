@@ -1,3 +1,7 @@
+1.2.1
++ Optimized the detection of metadata (TV show, season, episode)
++ Only run if detected media type is "tvshow", "season" or "episode" (or unset):
+  This prevents the "XY not found" notification when watching movies.
 1.2.0
 + Fixed problems with some show titles
 + Verified that the Add-On works as expected with Jarvis
