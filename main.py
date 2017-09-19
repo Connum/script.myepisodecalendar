@@ -169,19 +169,28 @@ class Player(xbmc.Player):
         self._tracker.start()
 
         filename_full_path = self.getPlayingFile().decode('utf-8')
+
+        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+        currentPlaylistItemInfo = playlist[playlist.getposition()].getVideoInfoTag()
+
+        mediaType = xbmc.getInfoLabel("ListItem.DBType") or currentPlaylistItemInfo.getMediaType()
+        log('Player - MediaType: %s' % mediaType)        
+
         # We don't want to take care of any URL because we can't really gain
-        # information from it.
-        if _is_excluded(filename_full_path):
+        # information from it. We also only want to check TV episodes, so skip everything else.
+        # (not explicitely checking for "episode", "season" or "tvshow", because sometimes it may return empty as well)
+        if mediaType in ["movie","musicvideo","music","song","album","artist"] or _is_excluded(filename_full_path):
             self._tearDown()
             return
 
         # Try to find the title with the help of XBMC (Theses came from
         # XBMC.Subtitles add-ons)
-        self.season = str(xbmc.getInfoLabel("VideoPlayer.Season"))
+        # Falling back to currentPlaylistItemInfo, because getInfoLabel() seems to return empty values most of the time!
+        self.season = str(xbmc.getInfoLabel("VideoPlayer.Season")) or currentPlaylistItemInfo.getSeason()
         log('Player - Season: %s' % self.season)
-        self.episode = str(xbmc.getInfoLabel("VideoPlayer.Episode"))
+        self.episode = str(xbmc.getInfoLabel("VideoPlayer.Episode")) or currentPlaylistItemInfo.getEpisode()
         log('Player - Episode: %s' % self.episode)
-        self.title = xbmc.getInfoLabel("VideoPlayer.TVshowtitle")
+        self.title = xbmc.getInfoLabel("VideoPlayer.TVshowtitle") or currentPlaylistItemInfo.getTVShowTitle()
         log('Player - TVShow: %s' % self.title)
         if self.title == "":
             filename = os.path.basename(filename_full_path)
