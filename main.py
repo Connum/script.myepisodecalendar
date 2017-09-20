@@ -174,7 +174,7 @@ class Player(xbmc.Player):
         currentPlaylistItemInfo = playlist[playlist.getposition()].getVideoInfoTag()
 
         mediaType = xbmc.getInfoLabel("ListItem.DBType") or currentPlaylistItemInfo.getMediaType()
-        log('Player - MediaType: %s' % mediaType)        
+        log('Player - MediaType: %s' % mediaType)
 
         # We don't want to take care of any URL because we can't really gain
         # information from it. We also only want to check TV episodes, so skip everything else.

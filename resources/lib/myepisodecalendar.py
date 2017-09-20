@@ -193,7 +193,7 @@ class MyEpisodeCalendar(object):
 
         if showid is None:
             return new_name, None
-        return new_name, int(showid.strip()), 
+        return new_name, int(showid.strip()),
 
     # This is totally stolen from script.xbmc.subtitles plugin !
     def get_info(self, file_name):
