@@ -4,7 +4,7 @@
 from BeautifulSoup import BeautifulSoup
 import cookielib
 import re
-import urllib, urllib2, urlparse
+import urllib, urllib2
 # import xbmc # only for debugging
 
 # This is totally stolen from script.xbmc.subtitles plugin !

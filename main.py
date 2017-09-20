@@ -30,7 +30,7 @@ if __addon__.getSetting('tvsna-enabled'):
         sys.path = [xbmc.translatePath( os.path.join(addon_path, 'resources', 'lib') )] + sys.path
 
         from default import NextAired
-        import xbmcvfs, xbmcgui
+        import xbmcgui
     except:
         __nextAired__     = False
 
