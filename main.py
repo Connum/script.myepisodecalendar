@@ -152,16 +152,16 @@ class Player(xbmc.Player):
                 notif(self.title, time=2000)
             return
         was_added = self.mye.add_show(self.showid)
-        added = 32926
+        addedStringId = 32926
 
         showAddNotif = True
         if was_added:
             if __addon__.getSetting('showNotif-autoadd') != "true":
                 showAddNotif = False
-            added = 32925
+            addedStringId = 32925
         
         if showAddNotif is True:
-            notif("%s %s" % (self.title, __language__(32925)))
+            notif("%s %s" % (self.title, __language__(addedStringId)))
 
     def onPlayBackStarted(self):
         self._setUp()
