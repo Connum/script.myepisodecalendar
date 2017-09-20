@@ -317,7 +317,6 @@ def addShowsToTSNA(mye, progressdiag=False, silent=False):
         if ';' in seriesTitle:
             seriesTitle = seriesTitle.split(';')[0]
 
-        
         log('Looking up TVDB ID for series "%s" | MYE ID: %s' % (seriesTitle, seriesID_mye))
         if not silent:
             if checkRemoved:
