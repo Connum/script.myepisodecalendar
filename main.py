@@ -159,7 +159,7 @@ class Player(xbmc.Player):
             if __addon__.getSetting('showNotif-autoadd') != "true":
                 showAddNotif = False
             addedStringId = 32925
-        
+
         if showAddNotif is True:
             notif("%s %s" % (self.title, __language__(addedStringId)))
 
