@@ -285,7 +285,7 @@ def addShowsToTSNA(mye, progressdiag=False, silent=False):
     if (not progressdiag and not silent):
         progressdiag = addShowsProgressDiag()
 
-    tvdbLang = __nextAired__.getSetting("SearchLang").split(' ')[0]
+    # tvdbLang = __nextAired__.getSetting("SearchLang").split(' ')[0]
 
     ESSetting = __nextAired__.getSetting("ExtraShows")
     ExtraShows = re.findall(r"(?:mec)?\d+", ESSetting)
