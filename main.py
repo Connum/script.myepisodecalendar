@@ -22,17 +22,14 @@ DB_CACHE_TVDB_IDS = 'cache.tvdb.ids.db'
 
 __nextAired__     = False
 
-if __addon__.getSetting('tvsna-enabled'):
-    try:
-        __nextAired__     = xbmcaddon.Addon(id='script.tv.show.next.aired')
-        addon_path = __nextAired__.getAddonInfo('path')
-        sys.path.append (xbmc.translatePath( os.path.join(addon_path) ))
-        sys.path = [xbmc.translatePath( os.path.join(addon_path, 'resources', 'lib') )] + sys.path
+if __addon__.getSetting('tvsna-enabled') and xbmc.getCondVisibility('System.HasAddon(%s)' % 'script.tv.show.next.aired') == 1:
+    __nextAired__     = xbmcaddon.Addon(id='script.tv.show.next.aired')
+    addon_path = __nextAired__.getAddonInfo('path')
+    sys.path.append (xbmc.translatePath( os.path.join(addon_path) ))
+    sys.path = [xbmc.translatePath( os.path.join(addon_path, 'resources', 'lib') )] + sys.path
 
-        from default import NextAired
-        import xbmcgui
-    except:
-        __nextAired__     = False
+    from default import NextAired
+    import xbmcgui
 
 from resources.lib.myepisodecalendar import MyEpisodeCalendar
 
