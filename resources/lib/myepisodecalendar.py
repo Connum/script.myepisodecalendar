@@ -72,7 +72,7 @@ class MyEpisodeCalendar(object):
             'submit' : "Login",
             })
         login_url = "%s/%s" % (MYEPISODE_URL, "login/")
-        data = self.send_req(login_url, login_data)
+        self.send_req(login_url, login_data)
 
         return self.check_login_status_from_settings()
 
