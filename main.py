@@ -168,6 +168,12 @@ class Player(xbmc.Player):
         filename_full_path = self.getPlayingFile().decode('utf-8')
 
         playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+
+        if playlist.size() < 1:
+            log('Playlist empty - this is probably a PVR channel. Abort.')
+            self._tearDown()
+            return
+
         currentPlaylistItemInfo = playlist[playlist.getposition()].getVideoInfoTag()
 
         mediaType = xbmc.getInfoLabel("ListItem.DBType") or currentPlaylistItemInfo.getMediaType()
@@ -219,10 +225,14 @@ class Player(xbmc.Player):
     def onPlayBackEnded(self):
         self._tearDown()
 
-        actual_percent = (self._lastPos/self._totalTime)*100
-        log('lastPos / totalTime : %s / %s = %s %%' % (self._lastPos,
-            self._totalTime, actual_percent))
-        if (actual_percent < self._min_percent):
+        if self._totalTime == 0 or self._totalTime is None:
+            log('could not get totalTime - assume finished')
+            actual_percent = 100
+        else: 
+            actual_percent = (self._lastPos/self._totalTime)*100
+            log('lastPos / totalTime : %s / %s = %s %%' % (self._lastPos,
+                self._totalTime, actual_percent))
+        if actual_percent < self._min_percent or self.showid is None or self.season is None or self.episode is None:
             return
 
         # Playback is finished, set the items to watched
@@ -352,11 +362,11 @@ def addShowsToTSNA(mye, progressdiag=False, silent=False):
 
         if (len(show_stack) < 1):
             break
-    
+
     NextAired.save_file(TVDBidCache, DB_CACHE_TVDB_IDS)
 
     percentStepTwo = 0
-    
+
     # delete shows that are no longer followed on MyEpisodeCalendar
     if(checkRemoved):
         tvdbIds = mceIDsToTVDBIDs(mye.shows, TVDBidCache)
@@ -423,6 +433,3 @@ elif ( __nextAired__ and sys.argv and sys.argv[1] and sys.argv[1] == 'addShowsNo
         addShowsToTSNA(mye, progressdiag)
     
     sys.exit(0)
-
-
-    
