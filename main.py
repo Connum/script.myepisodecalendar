@@ -7,17 +7,16 @@ import sys
 import threading
 import xbmc, xbmcaddon
 
-__addon__         = xbmcaddon.Addon()
-__addonid__       = __addon__.getAddonInfo('id')
-__cwd__           = __addon__.getAddonInfo('path')
-__icon__          = __addon__.getAddonInfo("icon")
-__scriptname__    = __addon__.getAddonInfo('name')
-__version__       = __addon__.getAddonInfo('version')
-__language__      = __addon__.getLocalizedString
-__resource_path__ = os.path.join(__cwd__, 'resources', 'lib')
-__resource__      = xbmc.translatePath(__resource_path__).decode('utf-8')
-__datapath__      = os.path.join(xbmc.translatePath('special://masterprofile/addon_data/').decode('utf-8'), __addonid__)
-
+mce_addon          = xbmcaddon.Addon()
+# mce_addon_id       = mce_addon.getAddonInfo('id')
+mce_addon_path     = mce_addon.getAddonInfo('path')
+mce_addon_icon     = mce_addon.getAddonInfo('icon')
+mce_addon_name     = mce_addon.getAddonInfo('name')
+mce_addon_version  = mce_addon.getAddonInfo('version')
+mce_lang           = mce_addon.getLocalizedString
+mce_resource_path  = os.path.join(mce_addon_path, 'resources', 'lib')
+mce_resource       = xbmc.translatePath(mce_resource_path).decode('utf-8')
+# mce_datapath       = os.path.join(xbmc.translatePath('special://masterprofile/addon_data/').decode('utf-8'), mce_addon_id)
 
 from resources.lib.myepisodecalendar import MyEpisodeCalendar
 
@@ -41,7 +40,7 @@ class Player(xbmc.Player):
         self.showid = self.episode = self.title = self.season = None
         self._totalTime = 999999
         self._lastPos = 0
-        self._min_percent = int(__addon__.getSetting('watched-percent'))
+        self._min_percent = int(mce_addon.getSetting('watched-percent'))
         self._tracker = None
         self._playbackLock = threading.Event()
         self._monitor = Monitor(action = self._reset)
@@ -80,10 +79,10 @@ class Player(xbmc.Player):
 
     @staticmethod
     def _loginMyEpisodeCalendar(silent=False):
-        username = __addon__.getSetting('Username')
-        password = __addon__.getSetting('Password')
+        username = mce_addon.getSetting('Username')
+        password = mce_addon.getSetting('Password')
 
-        login_notif = __language__(32912)
+        login_notif = mce_lang(32912)
         if username is "" or password is "":
             notif(login_notif, time=2500)
             return None
@@ -91,23 +90,23 @@ class Player(xbmc.Player):
         showLoginNotif = True
         mye = MyEpisodeCalendar(username, password)
         if mye.is_logged:
-            if __addon__.getSetting('showNotif-login') != "true" or silent:
+            if mce_addon.getSetting('showNotif-login') != "true" or silent:
                 showLoginNotif = False
 
-            login_notif = "%s %s" % (username, __language__(32911))
+            login_notif = "%s %s" % (username, mce_lang(32911))
 
         if showLoginNotif is True:
             notif(login_notif, time=2500)
 
         if mye.is_logged and (not mye.get_show_list()):
-            notif(__language__(32927), time=2500)
+            notif(mce_lang(32927), time=2500)
 
         return mye
 
     def _mecReCheckAuth(self):
         if (not self.mye.is_logged):
             log("not logged in anymore")
-            login_notif = __language__(32912)
+            login_notif = mce_lang(32912)
             notif(login_notif, time=2500)
             return False
         return True
@@ -115,7 +114,7 @@ class Player(xbmc.Player):
     def _addShow(self):
         # Add the show if it's not already in our account
         if self.showid in self.mye.shows.values():
-            if __addon__.getSetting('showNotif-found') == "true":
+            if mce_addon.getSetting('showNotif-found') == "true":
                 notif(self.title, time=2000)
             return
         was_added = self.mye.add_show(self.showid)
@@ -123,12 +122,12 @@ class Player(xbmc.Player):
 
         showAddNotif = True
         if was_added:
-            if __addon__.getSetting('showNotif-autoadd') != "true":
+            if mce_addon.getSetting('showNotif-autoadd') != "true":
                 showAddNotif = False
             addedStringId = 32925
 
         if showAddNotif is True:
-            notif("%s %s" % (self.title, __language__(addedStringId)))
+            notif("%s %s" % (self.title, mce_lang(addedStringId)))
 
     def onPlayBackStarted(self):
         self._setUp()
@@ -179,13 +178,13 @@ class Player(xbmc.Player):
 
         self.title, self.showid = self.mye.find_show_id(self.title)
         if self.showid is None:
-            notif("%s %s" % (self.title, __language__(32923)), time=3000)
+            notif("%s %s" % (self.title, mce_lang(32923)), time=3000)
             self._tearDown()
             return
         log('Player - Found : %s - %d (S%s E%s)' % (self.title,
                 self.showid, self.season, self.episode))
 
-        if __addon__.getSetting('auto-add') == "true":
+        if mce_addon.getSetting('auto-add') == "true":
             self._addShow()
 
     def onPlayBackStopped(self):
@@ -209,7 +208,7 @@ class Player(xbmc.Player):
         found = 32923
         showMarkedNotif = True
         if self.mye.set_episode_watched(self.showid, self.season, self.episode):
-            if __addon__.getSetting('showNotif-marked') != "true":
+            if mce_addon.getSetting('showNotif-marked') != "true":
                 showMarkedNotif = False
             found = 32924
         else:
@@ -218,10 +217,10 @@ class Player(xbmc.Player):
 
         if showMarkedNotif is True:
             notif("%s (S%sE%s) %s" % (self.title, self.season.zfill(2), self.episode.zfill(2),
-                __language__(found)))
+                mce_lang(found)))
 
 def notif(msg, time=5000):
-    notif_msg = "\"%s\", \"%s\", %i, %s" % ('MyEpisodeCalendar', msg.decode('utf-8', "replace"), time, __icon__)
+    notif_msg = "\"%s\", \"%s\", %i, %s" % ('MyEpisodeCalendar', msg.decode('utf-8', "replace"), time, mce_addon_icon)
     xbmc.executebuiltin("XBMC.Notification(%s)" % notif_msg.encode('utf-8'))
 
 def log(msg):
@@ -230,7 +229,7 @@ def log(msg):
     except:
         pass
 
-    xbmc.log("### [%s] - %s" % (__scriptname__, msg, ),
+    xbmc.log("### [%s] - %s" % (mce_addon_name, msg, ),
             level=xbmc.LOGDEBUG)
 
 def _is_excluded(filename):
@@ -245,7 +244,7 @@ if ( __name__ == "__main__" ):
     if not player.mye.is_logged:
         sys.exit(0)
 
-    log( "[%s] - Version: %s Started" % (__scriptname__, __version__))
+    log( "[%s] - Version: %s Started" % (mce_addon_name, mce_addon_version))
 
     while not monitor.abortRequested():
         if monitor.waitForAbort(10):
