@@ -106,27 +106,3 @@ msgstr ""
 msgctxt "#32929"
 msgid "name of the series"
 msgstr ""
-
-msgctxt "#32960"
-msgid "TV Show Next Aired"
-msgstr ""
-
-msgctxt "#32961"
-msgid "Enable integration (if script.tv.show.next.aired is available)"
-msgstr ""
-
-msgctxt "#32962"
-msgid "Automatically delete shows removed from MyEpisodeCalendar"
-msgstr ""
-
-msgctxt "#32963"
-msgid "Update shows from MyEpisodeCalendar now"
-msgstr ""
-
-msgctxt "#32964"
-msgid "Update shows from MyEpisodeCalendar on startup"
-msgstr ""
-
-msgctxt "#32965"
-msgid "Show Next Aired window on startup"
-msgstr ""

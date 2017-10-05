@@ -18,18 +18,6 @@ __resource_path__ = os.path.join(__cwd__, 'resources', 'lib')
 __resource__      = xbmc.translatePath(__resource_path__).decode('utf-8')
 __datapath__      = os.path.join(xbmc.translatePath('special://masterprofile/addon_data/').decode('utf-8'), __addonid__)
 
-DB_CACHE_TVDB_IDS = 'cache.tvdb.ids.db'
-
-__nextAired__     = False
-
-if __addon__.getSetting('tvsna-enabled') and xbmc.getCondVisibility('System.HasAddon(%s)' % 'script.tv.show.next.aired') == 1:
-    __nextAired__     = xbmcaddon.Addon(id='script.tv.show.next.aired')
-    addon_path = __nextAired__.getAddonInfo('path')
-    sys.path.append (xbmc.translatePath( os.path.join(addon_path) ))
-    sys.path = [xbmc.translatePath( os.path.join(addon_path, 'resources', 'lib') )] + sys.path
-
-    from default import NextAired
-    import xbmcgui
 
 from resources.lib.myepisodecalendar import MyEpisodeCalendar
 
@@ -40,9 +28,6 @@ class Monitor(xbmc.Monitor):
 
     def onSettingsChanged( self ):
         log('#DEBUG# onSettingsChanged')
-        # remove shows added by plugin when integration is disabled
-        if __nextAired__ and __addon__.getSetting('tvsna-enabled') == 'false':
-            __nextAired__.setSetting("ExtraShows", re.sub(r"\D?mec\d+", '', __nextAired__.getSetting("ExtraShows")))
         self.action()
 
 class Player(xbmc.Player):
@@ -116,21 +101,6 @@ class Player(xbmc.Player):
 
         if mye.is_logged and (not mye.get_show_list()):
             notif(__language__(32927), time=2500)
-
-        if (not silent and __addon__.getSetting('tvsna-enabled') != "false"):
-            if(__nextAired__):
-                log('script.tv.show.next.aired is available')
-
-                changedCount = 0
-                if __addon__.getSetting('tvsna-onstartup') != "false":
-                    changedCount = addShowsToTSNA(mye, silent=True)
-
-                    if (changedCount > 0):
-                        xbmc.executebuiltin("XBMC.RunScript(script.tv.show.next.aired,force=True)")
-                    elif __addon__.getSetting('tvsna-showgui') != "false":
-                        xbmc.executebuiltin("XBMC.RunScript(script.tv.show.next.aired)")
-            else:
-                log('script.tv.show.next.aired is NOT available')
 
         return mye
 
