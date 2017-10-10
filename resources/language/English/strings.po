@@ -45,36 +45,12 @@ msgctxt "#32905"
 msgid "Automatically add shows"
 msgstr ""
 
-msgctxt "#32906"
-msgid "Adding shows to Next Aired..."
-msgstr ""
-
-msgctxt "#32907"
-msgid "Fetching series from MyEpisodeCalendar..."
-msgstr ""
-
-msgctxt "#32908"
-msgid "Looking up TVDB ID for"
-msgstr ""
-
-msgctxt "#32909"
-msgid "Finished adding shows."
-msgstr ""
-
-msgctxt "#32910"
-msgid "%s TVDB IDs have been added to Extra Shows,\n%s were already included,\n%s have been removed,\n%s failed."
-msgstr ""
-
 msgctxt "#32911"
 msgid "connected"
 msgstr ""
 
 msgctxt "#32912"
 msgid "Authentification failed"
-msgstr ""
-
-msgctxt "#32913"
-msgid "Checking delete status of"
 msgstr ""
 
 #empty strings from id 32913 to 32922

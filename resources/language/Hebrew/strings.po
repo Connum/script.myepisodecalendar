@@ -46,35 +46,6 @@ msgctxt "#32905"
 msgid "Automatically add shows"
 msgstr "הוסף סדרות באופן אוטומטי"
 
-msgctxt "#32906"
-msgid "Adding shows to Next Aired..."
-msgstr "הוספת סדרות לשידור הבא..."
-
-msgctxt "#32907"
-msgid "Fetching series from MyEpisodeCalendar..."
-msgstr "שולף סדרה מ-MyEpisodeCalendar..."
-
-msgctxt "#32908"
-msgid "Looking up TVDB ID for"
-msgstr "מחפש מזהה TVDB"
-
-msgctxt "#32909"
-msgid "Finished adding shows."
-msgstr "סיים להוסיף סדרות."
-
-msgctxt "#32910"
-msgid ""
-"%s TVDB IDs have been added to Extra Shows,\n"
-"%s were already included,\n"
-"%s have been removed,\n"
-"%s failed."
-msgstr ""
-"%s מזהי TVDB נוספו לסדרות הנוספות,\n"
-"%s TVDB נוספו לתצוגות נוספות,\n"
-"%s כבר נכללו,\n"
-"%s הוסרו,\n"
-"%s נכשלו."
-
 msgctxt "#32911"
 msgid "connected"
 msgstr "מחובר"
@@ -82,10 +53,6 @@ msgstr "מחובר"
 msgctxt "#32912"
 msgid "Authentification failed"
 msgstr "האימות נכשל"
-
-msgctxt "#32913"
-msgid "Checking delete status of"
-msgstr "בדיקת מצב מחיקה של"
 
 # empty strings from id 32913 to 32922
 msgctxt "#32923"
