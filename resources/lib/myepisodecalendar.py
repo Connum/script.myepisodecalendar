@@ -5,7 +5,12 @@ from BeautifulSoup import BeautifulSoup
 import cookielib
 import re
 import urllib, urllib2
-# import xbmc # only for debugging
+ 
+# only for debugging
+# import xbmc
+# def log(msg):
+#    xbmc.log("################## DEBUG: \n%s" % (msg, ),
+#        level=xbmc.LOGDEBUG)
 
 # This is totally stolen from script.xbmc.subtitles plugin !
 REGEX_EXPRESSIONS = [
@@ -33,10 +38,6 @@ def sanitize(title, replace):
     title = title.replace('  ', ' ')
     return title
 
-# only for debugging
-# def log(msg):
-#    xbmc.log("################## DEBUG: \n%s" % (msg, ),
-#        level=xbmc.LOGDEBUG)
 
 class MyEpisodeCalendar(object):
 
