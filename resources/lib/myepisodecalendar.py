@@ -9,7 +9,7 @@ import urllib, urllib2
 # only for debugging
 # import xbmc
 # def log(msg):
-#    xbmc.log("################## DEBUG: \n%s" % (msg, ),
+#    xbmc.log("### [MyEpisodeCalendar] ### DEBUG: \n%s" % (msg, ),
 #        level=xbmc.LOGDEBUG)
 
 # This is totally stolen from script.xbmc.subtitles plugin !
