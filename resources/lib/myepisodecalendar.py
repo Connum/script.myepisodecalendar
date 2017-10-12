@@ -145,6 +145,8 @@ class MyEpisodeCalendar(object):
 
         show_href = None
         show_name_sanitized = sanitize(show_name.lower(), ' ')
+        # TODO: search for dashed notation in URL alternatively
+        # show_name_dashes = sanitize(show_name.lower(), '-') # TODO: different sanitization: reduce multiple dashes to one, remove single quote...
 
         for show in tvshownames:
             link = show.find("a", href=True)
