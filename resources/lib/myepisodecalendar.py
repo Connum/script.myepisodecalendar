@@ -191,11 +191,16 @@ class MyEpisodeCalendar(object):
         new_name, show_href = self.find_show_link(data, show_name)
 
         # TODO: try to automatically request a show to be added to MEC
-        # TODO: check if this is working for MEC
         if show_href is None:
+            firstchar = show_name[0]
+            if firstchar.isalpha():
+                firstchar = firstchar.upper()
+            else:
+                firstchar = '0-9'
+
             # Try to lookup the list of all the shows to find the exact title
             list_url = "%s/%s/%s" % (MYEPISODE_URL, "allShows/filter-by-name",
-                    show_name[0].upper())
+                    firstchar)
             data = self.send_req(list_url)
             new_name, show_href = self.find_show_link(data, show_name, strict=True)
 
