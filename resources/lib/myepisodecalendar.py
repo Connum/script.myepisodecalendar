@@ -32,9 +32,13 @@ REGEX_EXPRESSIONS = [
 MYEPISODE_URL = "http://www.myepisodecalendar.com"
 
 def sanitize(title, replace):
-    pattern = re.compile('[^A-Za-z0-9]+', re.UNICODE | re.IGNORECASE)
+    pattern = re.compile('[^A-Za-z0-9' + re.escape(replace) + ']', re.UNICODE | re.IGNORECASE)
     rPattern = re.compile('[\']+', re.UNICODE | re.IGNORECASE)
     sPattern = re.compile('\s+', re.UNICODE | re.IGNORECASE)
+
+    title = title.replace('&', ' and ')
+    title = title.replace(': ', ' - ')
+    title = sPattern.sub(' ', title)
 
     title = pattern.sub(replace, title)
     title = rPattern.sub('', title)
@@ -180,7 +184,7 @@ class MyEpisodeCalendar(object):
 
         # It's not in our account yet ?
         # Try Find a show through its name and report its id
-        search_url = "%s/%s/%s" % (MYEPISODE_URL, "search", show_name.strip(' .').replace(' ', '_'))
+        search_url = "%s/%s/%s" % (MYEPISODE_URL, "search", sanitize(show_name.strip(' .'), '_'))
         data = self.send_req(search_url)
         new_name, show_href = self.find_show_link(data, show_name)
 
