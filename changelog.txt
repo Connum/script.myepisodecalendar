@@ -3,6 +3,7 @@
 + removed empty tags in addon.xml > xbmc.addon.metadata to pass Travis schema validation
 + removed transparency in icon.png and minimized file size
 + removed script.tv.show.next.aired import left over from former integration
++ updated language structure by using script.language-convert-0.0.3
 1.4.1
 + Fixed login by switching myepisodecalendar URLs to https
 + Switched TVDB API URLs to https
